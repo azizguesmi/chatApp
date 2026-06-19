@@ -90,3 +90,33 @@ func AddUser(user model.User) (int64, error) {
 
 	return last_id, nil
 }
+
+func UpdateUser(user model.User) (bool, error) {
+	conn, err := db.Connect()
+
+	if err != nil {
+		return false, fmt.Errorf("connection error in get user %w ", err)
+	}
+	defer conn.Close()
+
+	res, err := conn.Conn.Exec(
+		"UPDATE users  SET username=?, email=?, password_hashed=?",
+		user.UserName,
+		user.Email,
+		user.PasswordHashed,
+	)
+
+	if err != nil {
+		return false, fmt.Errorf("user update error %w", err)
+	}
+	rowAffected, err := res.RowsAffected()
+
+	if err != nil {
+		return false, err
+	}
+
+	if rowAffected == 0 {
+		return false, nil
+	}
+	return true, nil
+}
