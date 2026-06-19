@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 )
 
 func GetUserByID(id int) (*model.User, error) {
@@ -119,4 +120,33 @@ func UpdateUser(user model.User) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func GetAllUsers() ([]model.User, error) {
+	conn, err := db.Connect()
+
+	if err != nil {
+		return nil, fmt.Errorf("error connection to db hile getting all users %w", err)
+	}
+	defer conn.Close()
+
+	res, err := conn.Conn.Query(
+		"SELECT id,username,email,password_hashed,created_at FROM user",
+	)
+
+	var users []model.User
+
+	for res.Next() {
+		var u model.User
+		err = res.Scan(&u.ID, &u.Email, &u.PasswordHashed, &u.CreatedAt)
+		if err != nil {
+			log.Println("skipping corrupted user", err)
+			continue
+		}
+		users = append(users, u)
+	}
+	if err = res.Err(); err != nil {
+		return nil, err
+	}
+	return users, nil
 }
