@@ -67,7 +67,7 @@ func AddUser(user model.User) (int64, error) {
 	conn, err := db.Connect()
 
 	if err != nil {
-		return 0, fmt.Errorf("connection error in get user %w ", err)
+		return 0, fmt.Errorf("connection error in add user %w ", err)
 	}
 	defer conn.Close()
 

@@ -3,6 +3,7 @@ package database
 import (
 	conf "backend/internal/config"
 	"database/sql"
+	"fmt"
 
 	_ "modernc.org/sqlite"
 )
@@ -17,7 +18,8 @@ func Connect() (*Connection, error) {
 	if err != nil {
 		return nil, err
 	}
-	db, err := sql.Open("sqlite3", c.DB)
+	fmt.Printf("path %s\n", c.DB)
+	db, err := sql.Open("sqlite", c.DB)
 	if err != nil {
 		return nil, err
 	}
@@ -25,5 +27,5 @@ func Connect() (*Connection, error) {
 }
 
 func (c *Connection) Close() {
-	c.Close()
+	c.Conn.Close()
 }

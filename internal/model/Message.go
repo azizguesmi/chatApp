@@ -8,4 +8,5 @@ type Message struct {
 	SenderID   int       `json:"sender_id"`
 	ReceiverID int       `json:"receiver_id"`
 	CreatedAt  time.Time `json:"created_at"`
+	Rec_type   string    `json:"rec_type"`
 }
