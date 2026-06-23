@@ -119,9 +119,6 @@ func GetMessageById(id int) (*model.Message, error) {
 		"SELECT id,sender_id,receiver_id_user,content,created_at,rec_type,receiver_id_group FROM messages WHERE id=?",
 		id,
 	).Scan(&m.ID, &m.SenderID, &m.ReceiverID, &m.Content, &m.CreatedAt, &m.Rec_type, &m.ReceiverID)
-	if err != nil {
-		return nil, fmt.Errorf("error while exec the query %w", err)
-	}
 
 	if err != nil {
 		if err == sql.ErrNoRows {
