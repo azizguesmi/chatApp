@@ -140,3 +140,47 @@ func GetMessageById(id int) (*model.Message, error) {
 	}
 	return &m, nil
 }
+
+func GetAllMessages() ([]model.Message, error) {
+	fn := "GetAllMessages"
+	conn, err := db.Connect()
+	if err != nil {
+		return nil, fmt.Errorf("error connection to db while connection to db in %s %w", fn, err)
+	}
+	defer conn.Close()
+	var ms []model.Message
+	rows, err := conn.Conn.Query(
+		"SELECT id, sender_id, receiver_id_user, content, created_at, rec_type, receiver_id_group FROM messages",
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error while executing query in %s %W", fn, err)
+	}
+	for rows.Next() {
+		var m model.Message
+		var receiverIdGroup *int
+		var receiverIdUser *int
+		err = rows.Scan(
+			&m.ID,
+			&m.SenderID,
+			receiverIdUser,
+			&m.Content,
+			&m.CreatedAt,
+			&m.Rec_type,
+			receiverIdGroup,
+		)
+		if err != nil {
+			log.Println("error while scanning line in gettingmessageByReceiver %w", err)
+			continue
+		}
+		if m.Rec_type == "USER" {
+			m.ReceiverID = *receiverIdUser
+		} else if m.Rec_type == "GROUP" {
+			m.ReceiverID = *receiverIdGroup
+		} else {
+			log.Fatal("error in receiver type")
+			continue
+		}
+		ms = append(ms, m)
+	}
+	return ms, nil
+}
