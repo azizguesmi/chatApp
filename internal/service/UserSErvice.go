@@ -4,6 +4,7 @@ import (
 	"backend/internal/model"
 	"backend/internal/repo"
 	"fmt"
+	"regexp"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -79,4 +80,22 @@ func UpdateUser(id int, username, email, password *string) (bool, error) {
 		return false, fmt.Errorf("error while updating user in service %w", err)
 	}
 	return test, err
+}
+
+func GetUserByEmail(email string) (*model.User, error) {
+	users, err := repo.GetAllUsers()
+	if err != nil {
+		return nil, fmt.Errorf("error in getting users")
+	}
+
+	re := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
+	if !re.MatchString(email) {
+		return nil, fmt.Errorf("error in email structure")
+	}
+	for _, u := range users {
+		if u.Email == email {
+			return &u, nil
+		}
+	}
+	return nil, fmt.Errorf("user not found")
 }

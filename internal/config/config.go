@@ -9,13 +9,13 @@ import (
 
 type Config struct {
 	Port string `env:"PORT" envDefault:"8080"`
-	DB   string `env:"DB" envDefault:"db.chat"`
+	DB   string `env:"DB" envDefault:"C:/Users/guesm/Documents/chat app/backend/internal/db/db.chat"`
 	JWT  string `env:"JWT" envDefault:"secret"`
 }
 
 func NewConfig() (*Config, error) {
 	// load .env file
-	if err := godotenv.Load("../config/.env"); err != nil {
+	if err := godotenv.Load("../../internal/config/.env"); err != nil {
 		log.Println("no .env file found, using system env")
 	}
 
