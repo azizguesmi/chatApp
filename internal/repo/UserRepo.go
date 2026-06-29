@@ -21,7 +21,7 @@ func GetUserByID(id int) (*model.User, error) {
 	defer connection.Close()
 
 	err = connection.Conn.QueryRow(
-		"SELECT id username email password_hashed created_at FROM users WHERE id=?",
+		"SELECT id, username, email, password_hashed, created_at FROM users WHERE id=?",
 		id,
 	).Scan(&user.ID, &user.UserName, &user.Email, &user.PasswordHashed, &user.CreatedAt)
 
@@ -131,14 +131,18 @@ func GetAllUsers() ([]model.User, error) {
 	defer conn.Close()
 
 	res, err := conn.Conn.Query(
-		"SELECT id,username,email,password_hashed,created_at FROM user",
+		"SELECT id,username,email,password_hashed,created_at FROM users",
 	)
+	if err != nil {
+		return nil, fmt.Errorf("error getting all users %w", err)
+	}
+	defer res.Close()
 
 	var users []model.User
 
 	for res.Next() {
 		var u model.User
-		err = res.Scan(&u.ID, &u.Email, &u.PasswordHashed, &u.CreatedAt)
+		err = res.Scan(&u.ID, &u.UserName, &u.Email, &u.PasswordHashed, &u.CreatedAt)
 		if err != nil {
 			log.Println("skipping corrupted user", err)
 			continue

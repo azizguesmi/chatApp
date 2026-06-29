@@ -20,7 +20,7 @@ func AddMessage(message model.Message) (int64, error) {
 	var res sql.Result
 	if message.Rec_type == "USER" {
 		res, err = conn.Conn.Exec(
-			"INSERT INTO messages (sender_id,receiver_id_user,content,created_at,rec_type, receiver_id_group) VALUES (?,?,?,?,?)",
+			"INSERT INTO messages (sender_id,receiver_id_user,content,created_at,rec_type, receiver_id_group) VALUES (?,?,?,?,?,?)",
 			message.SenderID,
 			message.ReceiverID,
 			message.Content,
@@ -30,7 +30,7 @@ func AddMessage(message model.Message) (int64, error) {
 		)
 	} else if message.Rec_type == "GROUP" {
 		res, err = conn.Conn.Exec(
-			"INSERT INTO messages (sender_id,receiver_id_user,content,created_at,rec_type, receiver_id_group) VALUES (?,?,?,?,?)",
+			"INSERT INTO messages (sender_id,receiver_id_user,content,created_at,rec_type, receiver_id_group) VALUES (?,?,?,?,?,?)",
 			message.SenderID,
 			nil,
 			message.Content,
@@ -38,6 +38,8 @@ func AddMessage(message model.Message) (int64, error) {
 			message.Rec_type,
 			message.ReceiverID,
 		)
+	} else {
+		return 0, fmt.Errorf("invalid rec_type %s", message.Rec_type)
 	}
 	if err != nil {
 		return 0, fmt.Errorf("error while exection of query in adding message %w", err)

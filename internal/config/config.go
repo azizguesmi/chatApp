@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Port string `env:"PORT" envDefault:"8080"`
-	DB   string `env:"DB" envDefault:"C:/Users/guesm/Documents/chat app/backend/internal/db/db.chat"`
+	DB   string `env:"DB" envDefault:"internal/db/db.chat"`
 	JWT  string `env:"JWT" envDefault:"secret"`
 }
 

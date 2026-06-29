@@ -4,6 +4,10 @@ import (
 	"backend/internal/service"
 	"encoding/json"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
+
+	middleware "backend/internal/MiddleWare"
 )
 
 type reqUser struct {
@@ -27,14 +31,20 @@ func HandelAddUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	id, err := service.AddUser(req.Username, req.Password, req.Email)
+	id, err := service.AddUser(req.Username, req.Email, req.Password)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	token, err := middleware.GenerateJWT(int(id))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]int64{
-		"message_id": id,
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"token": token,
 	})
 }
 
@@ -52,9 +62,25 @@ func HandelLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if user.PasswordHashed != string(hash) {
+		http.Error(w, "Invalid Password", http.StatusUnauthorized)
+		return
+	}
+	token, err := middleware.GenerateJWT(user.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(map[string]int64{
-		"user_id": int64(user.ID),
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"token": token,
 	})
 }
 
@@ -82,6 +108,7 @@ func HandelDeleteUser(w http.ResponseWriter, r *http.Request) {
 		res = "Deleted succesfully"
 	}
 	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": res,
 	})

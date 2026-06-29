@@ -1,15 +1,16 @@
 package repo
 
 import (
-	db "backend/internal/database"
-	"backend/internal/model"
 	"database/sql"
 	"errors"
 	"fmt"
 	"log"
+
+	db "backend/internal/database"
+	"backend/internal/model"
 )
 
-func GetGroupById(id int) (*model.Group, error) {
+func GetGroupByID(id int) (*model.Group, error) {
 	fn := "GetGroupById"
 	conn, err := db.Connect()
 	if err != nil {
@@ -79,12 +80,15 @@ func AddGroup(group model.Group) (int64, error) {
 		group.CreatorID,
 		group.CreatedAt,
 	)
-	lastId, err := res.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("error while exec query in %s err : %w", fn, err)
+	}
+	lastID, err := res.LastInsertId()
 	if err != nil {
 		return 0, fmt.Errorf("error while trying to get last inserted row in %s %w ", fn, err)
 	}
 
-	return lastId, nil
+	return lastID, nil
 }
 
 func AddMembersToGroup(members []int, groupId int) (int64, error) {
