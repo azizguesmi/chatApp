@@ -188,7 +188,7 @@ func GetAllMessages() ([]model.Message, error) {
 }
 
 
-func UpdateMessage(id int, content string) (bool, error) {
+func UpdateMessage(id int, content string, sender_id int) (bool, error) {
 	fn := "UpdateMessage"
 	conn, err := db.Connect()
 	if err != nil {
@@ -196,9 +196,10 @@ func UpdateMessage(id int, content string) (bool, error) {
 	}
 	defer conn.Close()
 	res, err := conn.Conn.Exec(
-		"UPDATE messages SET content = ? WHERE id=?",
+		"UPDATE messages SET content = ? WHERE id=? AND sender_id=?",
 		content,
 		id,
+		sender_id,
 	)
 	if err != nil {
 		return false, fmt.Errorf("error while exec querry in %s err : %w", fn, err)

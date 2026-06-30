@@ -4,6 +4,7 @@ import (
 	"backend/internal/model"
 	"backend/internal/repo"
 	"fmt"
+	"time"
 )
 
 func AddMessage(content string, senderId, receiverId int, Rec_type string) (int64, error) {
@@ -12,6 +13,7 @@ func AddMessage(content string, senderId, receiverId int, Rec_type string) (int6
 		SenderID:   senderId,
 		ReceiverID: receiverId,
 		Rec_type:   Rec_type,
+		CreatedAt: time.Now(),
 	}
 
 	id, err := repo.AddMessage(mess)
@@ -76,8 +78,8 @@ func GetMessageReceivedByAGroup(id int) ([]model.Message, error) {
 	return mess, nil
 }
 
-func UpdateMessageContent(id int, content string) (bool, error){
-	test, err := repo.UpdateMessage(id, content)
+func UpdateMessageContent(id int, content string, senderId int) (bool, error){
+	test, err := repo.UpdateMessage(id, content, senderId)
 	if err != nil {
 		return false, fmt.Errorf("error in updatiing (service) %w", err)
 	}
