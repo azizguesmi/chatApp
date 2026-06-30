@@ -75,3 +75,21 @@ func GetMessageReceivedByAGroup(id int) ([]model.Message, error) {
 	}
 	return mess, nil
 }
+
+func UpdateMessageContent(id int, content string) (bool, error){
+	test, err := repo.UpdateMessage(id, content)
+	if err != nil {
+		return false, fmt.Errorf("error in updatiing (service) %w", err)
+	}
+	return test, nil
+}
+
+
+
+
+
+
+
+
+
+

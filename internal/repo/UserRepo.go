@@ -101,10 +101,11 @@ func UpdateUser(user model.User) (bool, error) {
 	defer conn.Close()
 
 	res, err := conn.Conn.Exec(
-		"UPDATE users  SET username=?, email=?, password_hashed=?",
+		"UPDATE users  SET username=?, email=?, password_hashed=? WHERE id=?",
 		user.UserName,
 		user.Email,
 		user.PasswordHashed,
+		user.ID,
 	)
 
 	if err != nil {

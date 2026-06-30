@@ -186,3 +186,33 @@ func GetAllMessages() ([]model.Message, error) {
 	}
 	return ms, nil
 }
+
+
+func UpdateMessage(id int, content string) (bool, error) {
+	fn := "UpdateMessage"
+	conn, err := db.Connect()
+	if err != nil {
+		return false, fmt.Errorf("error while connection to db err : %w in %s", err, fn)
+	}
+	defer conn.Close()
+	res, err := conn.Conn.Exec(
+		"UPDATE messages SET content = ? WHERE id=?",
+		content,
+		id,
+	)
+	if err != nil {
+		return false, fmt.Errorf("error while exec querry in %s err : %w", fn, err)
+	}	
+	rowaffected, err := res.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("err in getting effected rows in %s err :%w", fn, err)
+	}
+	if rowaffected == 0 {
+		return false,nil
+	}
+	return true, nil
+}
+
+
+
+
